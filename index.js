@@ -1,39 +1,36 @@
 const Discord = require('discord.js');
-const { Intents } = require('discord.js');
+const { GatewayIntentBits } = require('discord.js');
 const { Client } = require('discord.js');
-const client = new Client({ intents: 8 });
+const client = new Client({ 
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ]});
 
-const mySecret = process.env.TOKEN;
+  const COMMAND_PREFIX = "&";
 
-client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-});
+  client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+  });
+  
 
-client.on('message', message => {
-  // Vérifie que le message commence par "&hey"
-  if (message.content === '&hey') {
-    // Envoie le message "Salut !" sur le serveur Discord
-    message.channel.send('Salut !');
+// Command handler
+
+client.on('messageCreate', message => {
+  if (!message.content.startsWith(COMMAND_PREFIX)) return;
+
+  const command = message.content.substring(COMMAND_PREFIX.length);
+
+  if (command === 'ping') {
+    message.reply('Pong.');
+  }
+  else if (command === 'Bebou') {
+    message.reply('Love');
+  }
+  else if (command === 'hey') {
+    message.channel.send('hello there');
   }
 });
 
-client.login(mySecret);
-
-
-
-// client.on('ready', () => {
-//   console.log(`Logged in as ${client.user.tag}!`);
-// });
-
-// client.on('message', message => {
-//   // Vérifie que le message commence par le suffixe de commande
-//   if (message.content.startsWith(COMMAND_PREFIX)) {
-//     // Récupère le nom de la commande en enlevant le suffixe de commande
-//     const command = message.content.substring(COMMAND_PREFIX.length);
-
-//     // Vérifie que la commande est "salut"
-//     if (command === "salut") {
-//       message.channel.send("i'm back");
-//     }
-//   }
-// });
+client.login("OTAyNTY0OTc2NTIxMjYxMDc2.GDUHnl.jb3izQ_IXXJtfvhRfzk50N4EThV0cZIYxO-ycY");
