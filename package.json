@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@discordjs/opus": "^0.9.0",
     "busboy": "^1.6.0",
     "data-uri-to-buffer": "^4.0.0",
     "discord-api-types": "^0.37.25",
@@ -31,7 +32,8 @@
     "undici": "^5.14.0",
     "util-deprecate": "^1.0.2",
     "web-streams-polyfill": "^3.2.1",
-    "ws": "^8.11.0"
+    "ws": "^8.11.0",
+    "ytdl-core": "^4.11.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
