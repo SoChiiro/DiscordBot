@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const { GatewayIntentBits } = require('discord.js');
 const { Client, MessageAttachment } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 
 const client = new Client({ 
   intents: [
@@ -65,7 +66,7 @@ const client = new Client({
     "On n'est pas en vie pour accumuler des choses, on est en vie pour créer de la valeur. - Nana Sinek",
     "'T'es bien comme tu es tkt' - Nana",
     "Je pense qu'il faut que tu bouge ton cul la - Nana Chirac",
-    "Il suffit que tu traverse le trotoire pour y arriver - Nana Macron",
+    "Il suffit que tu traverse le trottoir pour y arriver - Nana Macron",
     "Tu sais, tu peux toujours essayer - Nana Obama",
     "La vie c'est comme le pain, un jour tu en a plus, et il faut pas qu'il y en ai plus - Nana Sasha",
     "La force et le courage font ta vérité- Nana Zelda",
@@ -135,7 +136,7 @@ client.on('messageCreate', message => {
   // Commande PCP 
 
   if ( command === 'kitsu') {
-    const randomNumber = Math.floor(Math.random() * 5) + 1;
+    const randomNumber = Math.floor(Math.random() * 6) + 1;
     message.delete();
     if (randomNumber === 1) {
       message.channel.send("**FEUKITSUUUUUUUUUUUUUUUUUUUUUUU**");
@@ -151,6 +152,9 @@ client.on('messageCreate', message => {
     }
     if (randomNumber === 5) {
       message.channel.send("**FEUKITSU**");
+    }
+    if (randomNumber === 6) {
+      message.channel.send("**Happy new Feukitsu**");
     }
   }
 
@@ -200,11 +204,21 @@ client.on('messageCreate', message => {
       message.channel.send("Je suis dépassé par les événements, mes parents m'ont inscrit pour gagner un concours, le concours, c'est uniquement pour les 18-24 ans et pour s'y inscrire, il faut envoyer un certificat de scolarité, car en plus d'avoir entre 18 et 24 ans, on doit être scolarisé. Du coup, il faut que je retrouve ce certificat de scolarité en envoyant un mail à ma responsable pédagogique. Relou, car je ne connais pas son adresse mail donc je vais devoir perdre du temps à contacter un camarade de classe pour obtenir son mail puis enfin mon certificat de scolarité. Enfin bon... Tout ça pour un concours et gagner un micro-onde... Puis imagine, je dois faire ça en moins de 1 semaine. ");
     }
   }
-    if (command === 'waya'){
-      message.delete()
-      message.channel.send('waya');
-    }
-});
+  if (command === 'waya'){
+    message.delete()
+    message.channel.send('waya');
+  }
+  // if (command === 'kushi'){
+  //   message.channel.send("**JOYEUX ANNIVERSAIRE KUSHI**");
+  //   message.channel.send({
+  //     files: ["https://www.funimada.com/assets/images/cards/big/bday-908.gif"]
+  //   });
+  // }
+  // else {
+  //   message.channel.send("Je ne connais pas cette commande bg/blg");
+  // }
+}
+);
 
 client.on('messageCreate', message => {
   if (!message.content.startsWith(COMMAND_PREFIX)) return;
@@ -265,7 +279,7 @@ client.on('messageCreate', message => {
         message.channel.send(`Ton score est de : ${randomNumber}`);
         message.channel.send("Je vois que tu deviens **curieux**... Intéressant... ")
         }
-    else if (randomNumber <= 41 && randomNumber >= 49) {
+    else if (randomNumber <= 49 && randomNumber >= 41) {
       message.channel.send(`Ton score est de : ${randomNumber}`);
       message.channel.send("Attention vous êtes presque pd et ça c'est très **pd**")
         }
@@ -347,4 +361,4 @@ client.on('messageCreate', message => {
   });
 });
 
-client.login("TOKEN");
+client.login("token");
