@@ -1,8 +1,8 @@
 'use strict';
 
-// This file contains the typedefs for camel-cased JSON data
 const { ComponentBuilder } = require('@discordjs/builders');
 const { ComponentType } = require('discord-api-types/v10');
+
 /**
  * @typedef {Object} BaseComponentData
  * @property {ComponentType} type The type of component
@@ -71,6 +71,7 @@ const { ComponentType } = require('discord-api-types/v10');
  * Transforms API data into a component
  * @param {APIMessageComponent|Component} data The data to create the component from
  * @returns {Component}
+ * @ignore
  */
 function createComponent(data) {
   if (data instanceof Component) {
@@ -103,6 +104,7 @@ function createComponent(data) {
  * Transforms API data into a component builder
  * @param {APIMessageComponent|ComponentBuilder} data The data to create the component from
  * @returns {ComponentBuilder}
+ * @ignore
  */
 function createComponentBuilder(data) {
   if (data instanceof ComponentBuilder) {
@@ -150,8 +152,3 @@ const TextInputBuilder = require('../structures/TextInputBuilder');
 const TextInputComponent = require('../structures/TextInputComponent');
 const UserSelectMenuBuilder = require('../structures/UserSelectMenuBuilder');
 const UserSelectMenuComponent = require('../structures/UserSelectMenuComponent');
-
-/**
- * @external JSONEncodable
- * @see {@link https://discord.js.org/#/docs/builders/main/typedef/JSONEncodable}
- */

@@ -3,6 +3,12 @@ const { GatewayIntentBits } = require("discord.js");
 const { Client, MessageAttachment } = require("discord.js");
 const { MessageEmbed } = require("discord.js");
 const { EmbedBuilder } = require("discord.js");
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
+const { AttachmentBuilder } = require("discord.js");
+const { createCanvas, loadImage } = require("canvas");
+const path = require("path");
 
 require("dotenv").config();
 const TOKEN = process.env.BOT_TOKEN;
@@ -32,6 +38,7 @@ const commands = {
   nana: "Vous trouverez de la sincérité dans ses propos",
   roll6: "Lance un dé à 6 faces",
   roll20: "Lance un dé à 20 faces",
+  meme: "Affiche un mème aléatoire",
   help: "Affiche cette liste de commandes.",
   // love: "Ship deux personnes pour voir leur compatibilité",
   // Bebou: "Love",
@@ -102,42 +109,22 @@ const commandHandlers = {
   },
 
   meme: async (message) => {
-    const meme = await fetch("https://meme-api.herokuapp.com/gimme");
-    const memeJson = await meme.json();
-    message.channel.send(memeJson.url);
+    try {
+      const response = await fetch("https://meme-api.com/gimme");
+      const data = await response.json();
+      const memeEmbed = new EmbedBuilder()
+        .setTitle(data.title)
+        .setImage(data.url)
+        .setFooter({ text: `From r/${data.subreddit}` })
+        .setColor("#FF4500");
+      message.channel.send({ embeds: [memeEmbed] });
+    } catch (error) {
+      console.error("Erreur lors de la récupération du mème :", error);
+      message.channel.send(
+        "Désolé, je n'ai pas pu récupérer de mème pour le moment."
+      );
+    }
   },
-
-  // love: (message) => {
-  //   try {
-  //     console.log("Commande love exécutée");
-  //     console.log("Message reçu:", message.content);
-  //     console.log("Mentions détectées:", message.mentions.users.size);
-
-  //     const users = [...message.mentions.users.values()];
-
-  //     if (users.length < 2) {
-  //       message.channel.send(
-  //         "Il faut mentionner deux personnes pour les shipper."
-  //       );
-  //       return;
-  //     }
-
-  //     console.log(`${users[0].username} et ${users[1].username}`);
-
-  //     const lovePercentage = Math.floor(Math.random() * 101);
-  //     const loveEmbed = new EmbedBuilder()
-  //       .setColor("#ff0000")
-  //       .setTitle("Love Calculator ❤️")
-  //       .setDescription(
-  //         `Le pourcentage d'amour entre ${users[0]} et ${users[1]} est de **${lovePercentage}%**`
-  //       );
-
-  //     message.channel.send({ embeds: [loveEmbed] });
-  //   } catch (error) {
-  //     console.error("Erreur dans la commande love:", error);
-  //     message.channel.send("Une erreur s'est produite avec la commande love.");
-  //   }
-  // },
 
   pong: (message) => {
     message.reply("Ping.");
@@ -303,6 +290,64 @@ const commandHandlers = {
   },
 };
 
+// Déplacer la commande text en dehors de commandHandlers
+client.on("messageCreate", async (message) => {
+  if (!message.content.startsWith(COMMAND_PREFIX) || message.author.bot) return;
+
+  const command = message.content
+    .substring(COMMAND_PREFIX.length)
+    .toLowerCase();
+
+  // Commande text
+  if (command.startsWith("text")) {
+    const rollingMessage = await message.channel.send(
+      "🖼️ Génération de l'image en cours..."
+    );
+
+    setTimeout(async () => {
+      const texte = message.content.slice(6).trim(); // Extraire le texte après &text
+      const imagePath = path.join(__dirname, "asset", "test.jpg");
+
+      console.log("texte", texte);
+      console.log("imagePath", imagePath);
+
+      try {
+        const image = await loadImage(imagePath);
+        const canvas = createCanvas(image.width, image.height);
+        const ctx = canvas.getContext("2d");
+
+        // Dessiner l'image sur le canvas
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        // Ajouter le texte à l'image
+        ctx.font = "30px sans-serif";
+        ctx.fillStyle = "white";
+        ctx.fillText(texte, 50, 50);
+
+        // Créer l'attachement avec l'image générée
+        const attachment = new AttachmentBuilder(canvas.toBuffer(), {
+          name: "image-texte.png",
+        });
+
+        // Modifier le message pour envoyer l'image avec le texte
+        rollingMessage.edit({
+          content: "Voici votre image avec le texte !",
+          files: [attachment],
+        });
+      } catch (error) {
+        console.error("Erreur lors du traitement de l'image :", error);
+        rollingMessage.edit(
+          "Une erreur est survenue lors de la génération de l'image."
+        );
+      }
+    }, 1000);
+  } else if (commandHandlers[command]) {
+    commandHandlers[command](message);
+  } else {
+    message.channel.send("Je ne connais pas cette commande bg/blg");
+  }
+});
+
 client.on("messageCreate", (message) => {
   if (!message.content.startsWith(COMMAND_PREFIX) || message.author.bot) return;
 
@@ -317,160 +362,3 @@ client.on("messageCreate", (message) => {
 });
 
 client.login(TOKEN);
-
-// // Commande without handler
-// client.on("messageCreate", (message) => {
-//   if (!message.content.startsWith(COMMAND_PREFIX)) return;
-
-//   const command = message.content
-//     .substring(COMMAND_PREFIX.length)
-//     .toLowerCase();
-
-//   // Commande fun
-//   if (command === "ping") {
-//     message.reply("Pong.");
-//   } else if (command === "bebou") {
-//     const randomNumber = Math.floor(Math.random() * 5) + 1;
-//     if (randomNumber === 1) {
-//       message.reply("Love");
-//     }
-//     if (randomNumber === 2) {
-//       message.reply("Bebou raptor");
-//     }
-//     if (randomNumber === 3) {
-//       message.reply("Beboulade");
-//     }
-//     if (randomNumber === 4) {
-//       message.reply("bebou bebou");
-//     }
-//     if (randomNumber === 5) {
-//       message.reply("bebounette");
-//     }
-//   } else if (command === "hey") {
-//     message.channel.send("hello there");
-//   }
-
-//   // NEWS
-//   if (command === "news") {
-//     message.channel.send(
-//       "Une prochaine mise à jour accueillera une nouvelle commande : **kushi** qui recommande des items de luxe, pour t'habiller gucci à la prochaine maj"
-//     );
-//   }
-//   if (command === "new") {
-//     message.channel.send(
-//       "Une prochaine mise à jour accueillera une nouvelle commande : **kushi** qui recommande des items de luxe, pour t'habiller gucci à la prochaine maj"
-//     );
-//   }
-
-//   if (command === "maj") {
-//     message.channel.send(
-//       `Nouvelle maj ! \nCette maj ajoute la commande **nana** qui permet de vous trouver du courage avec de belles citations de sa part`
-//     );
-//   }
-
-//   if (command === "jey") {
-//     const randomIndex = Math.floor(Math.random() * insults.length);
-//     // Envoie l'insulte aléatoire au canal de text
-//     message.channel.send(` Jey -> ${insults[randomIndex]} !`);
-//   }
-
-//   if (command === "nana") {
-//     const randomIndex = Math.floor(Math.random() * courage.length);
-//     // Envoie l'insulte aléatoire au canal de text
-//     message.channel.send(`${courage[randomIndex]}`);
-//   }
-
-//   if (command === "dodo") {
-//     const randomNumber = Math.floor(Math.random() * 10) + 1;
-//     message.channel.send("Désole mais...");
-//     if (randomNumber === 1) {
-//       message.channel.send(
-//         "Je ne peux venir parce qu'à cause de Valérie Pécresse, il y aura de gros problèmes sur ma ligne, la ligne numéro 7, mais je pourrais essayer de prendre une autre ligne par exemple en passant par le tram, mais il est toujours rempli et je n'ai pas envie de croiser mon ancienne prof du collègue qui prend toujours cette ligne pour aller au travail. Après on est samedi donc elle devrait pas aller au travail mais je pense que je dois pas prendre le risque donc allez-y sans moi pour cette fois. La prochaine fois, c'est chez moi."
-//       );
-//     }
-//     if (randomNumber === 2) {
-//       message.channel.send(
-//         "Je ne peux pas venir, j'ai 2 projets à rendre pour demain sur la relativité restreinte et vu que mon camarade ne me répond pas, je suis un peu dans la merde. En plus, j'ai un contrôle de 14 h 25 et 12 sec jusqu'à 18 h donc le temps de rentrer chez moi avec les transports t'imagine bien que ce n'est pas possible. En plus, j'ai 4 autres contrôles la semaine prochaine et j'ai aquaponey de 18h25 12 sec et 5 nano secondes jusqu'à 21h"
-//       );
-//     }
-//     if (randomNumber === 3) {
-//       message.channel.send(
-//         "Ce soir parce que j'ai trop de devoir, rien que la semaine dernière, j'ai eu au moins 2 contrôles et un oral et c'était vraiment trop dur, car je n'ai pas eu le temps de réviser, j'ai fait que dormir ahah. Mais ce soir, je vais travailler enfin, c'est ce que je me dis à chaque fois, mais cette fois, c'est la vérité. Mais du coup, la semaine prochaine, j'ai un gros contrôle et il compte pour au moins la moitié de ma moyenne donc c'est vraiment trop important alors je n'irais pas jouer. Enfin, peut-être en fin de soirée, je vais venir jouer, mais ne compter pas sur moi, vous voyez ce que je veux dire. ^^"
-//       );
-//     }
-//     if (randomNumber === 4) {
-//       message.channel.send(
-//         "Mais je dois aller chez un pote télécharger des trucs."
-//       );
-//     }
-//     if (randomNumber === 5) {
-//       message.channel.send(
-//         "Je dois aller récupérer mon ordinateur dans un dépôt et j'ai demandé à des amis de m'accompagner, car l'ordinateur est assez lourd donc je prévois l'après-midi entière pour aller le récupérer sachant en plus que le temps n'est pas ouf en ce moment faut compter au moins 2 h de plus le temps que je me décide à parti le récupérer. Je viens aussi avec 12 sacs au cas où donc ça fait quelques trajets en bus pour y aller enfin bref mdr"
-//       );
-//     }
-//     if (randomNumber === 6) {
-//       message.channel.send(
-//         "J'ai trouvé un vieux objet dans ma chambre, c'est fou parce qu'hier soir vers 20 h 45, je me suis dit faut vraiment que je range ma chambre après être presque tombé en trébuchant sur un vieux vêtement... Du coup je me suis levé à 10 h 07 avec la détermination de tout ranger et c'est à 14 h 26 que j'ai enfin trouvé ce vieux objet. Je vais donc aller voir mes parents pour discuter si je dois le jeter ou le revendre, mais en vrai, je vais peut-être le garder, car il est vieux, mais en le nettoyant avec de l'eau et du savon noir que mes parents ont acheté au marché la semaine dernière, je devrais pouvoir le rendre aussi beau qu'avant."
-//       );
-//     }
-//     if (randomNumber === 7) {
-//       message.channel.send(
-//         "Hier j'ai marché 20 min au moins alors que normalement je ne marche que 18 min ça fait que mes jambes ont un peu de mal à tenir le coup. Si tu ne me crois pas faut prendre en compte que je ne suis pas super sportif et le fait de ne pas avoir des chaussures de sport lorsque je marche fait que niveau cheville, elles ne tiennent pas de ouf les deux minutes supplémentaires... Faut savoir aussi que j'ai testé de mettre une casquette donc faut prendre en compte le faite que je peux faire 200 g de plus chose que mes jambes n'ont pas l'habitude du tout donc sorry."
-//       );
-//     }
-//     if (randomNumber === 8) {
-//       message.channel.send(
-//         "Je suis en colère malgré une connexion ultrarapide depuis que mes parents ont prix grâce à un abonnement à la fibre chez Orange le 01/01/2023 pour un prix exceptionnel de 24,99 € (vous ne retrouverez pas l'offre, c'était une offre limite pour les 100 premiers ahah) je n'arrive pas à télécharger mes jeux assez rapidement. Avant, quand j'étais en ADSL avec mon abonnement à 19,99 €, je pouvais télécharger Fortnite en 1h30 et maintenant que le technicien est passé pour installer la fibre, je prends 1 h pour télécharger le jeu... Enfin bref tout, c'est effort pour gagner seulement 30 minutes de téléchargement je pense que je vais aller porter réclamation chez Orange..."
-//       );
-//     }
-//     if (randomNumber === 9) {
-//       message.channel.send(
-//         "Je vais aller montrer à un pote comment on fait des crêpes alors que j'en ai jamais fait mdr"
-//       );
-//     }
-//     if (randomNumber === 10) {
-//       message.channel.send(
-//         "Je suis dépassé par les événements, mes parents m'ont inscrit pour gagner un concours, le concours, c'est uniquement pour les 18-24 ans et pour s'y inscrire, il faut envoyer un certificat de scolarité, car en plus d'avoir entre 18 et 24 ans, on doit être scolarisé. Du coup, il faut que je retrouve ce certificat de scolarité en envoyant un mail à ma responsable pédagogique. Relou, car je ne connais pas son adresse mail donc je vais devoir perdre du temps à contacter un camarade de classe pour obtenir son mail puis enfin mon certificat de scolarité. Enfin bon... Tout ça pour un concours et gagner un micro-onde... Puis imagine, je dois faire ça en moins de 1 semaine. "
-//       );
-//     }
-//   }
-//   if (command === "waya") {
-//     message.delete();
-//     message.channel.send("waya");
-//   }
-// });
-
-// client.on("messageCreate", (message) => {
-//   if (!message.content.startsWith(COMMAND_PREFIX)) return;
-
-//   const command = message.content.substring(COMMAND_PREFIX.length);
-
-//   if (command === "help") {
-//     let reply = "Voici la liste des commandes que je peux exécuter bg/blg :\n";
-
-//     for (const [name, description] of Object.entries(commands)) {
-//       reply += `\n- ${name}: ${description}`;
-//     }
-//     message.channel.send(reply);
-//   }
-// });
-
-// client.on("messageCreate", (message) => {
-//   if (!message.content.startsWith(COMMAND_PREFIX)) return;
-
-//   const command = message.content.substring(COMMAND_PREFIX.length);
-
-// client.on("messageCreate", (message) => {
-//   if (!message.content.startsWith("&citation")) return;
-
-//   const channel = message.guild.channels.cache.find(
-//     (channel) => channel.name === "citation"
-//   );
-//   channel.messages.fetch().then((messages) => {
-//     const randomIndex = Math.floor(Math.random() * messages.size);
-//     const randomMessage = messages.get(randomIndex);
-
-//     // Affiche le contenu du message
-//     console.log(randomMessage.content);
-//   });
-// });
