@@ -39,6 +39,8 @@ const commands = {
   roll6: "Lance un dé à 6 faces",
   roll20: "Lance un dé à 20 faces",
   meme: "Affiche un mème aléatoire",
+  thybot: "Pose une question à ThyBot",
+  facts: "Affiche un fait aléatoire",
   help: "Affiche cette liste de commandes.",
   // love: "Ship deux personnes pour voir leur compatibilité",
   // Bebou: "Love",
@@ -197,9 +199,7 @@ const commandHandlers = {
     } else if (randomNumber === 1) {
       message.channel.send(`Ton score est de : ${randomNumber}`);
       message.channel.send("Tu es fait ton Jey sale batard ?");
-    }
-    // Affiche un message et une image en fonction de la tranche de 10 dans laquelle se trouve le nombre aléatoire
-    else if (randomNumber >= 2 && randomNumber <= 10) {
+    } else if (randomNumber >= 2 && randomNumber <= 10) {
       message.channel.send(`Ton score est de : ${randomNumber}`);
       message.channel.send("Grrrr, Hétéro ? J'aime ça... ");
       message.channel.send({
@@ -290,75 +290,72 @@ const commandHandlers = {
   },
 };
 
-// Déplacer la commande text en dehors de commandHandlers
-client.on("messageCreate", async (message) => {
-  if (!message.content.startsWith(COMMAND_PREFIX) || message.author.bot) return;
+// client.on("messageCreate", (message) => {
+//   if (!message.content.startsWith(COMMAND_PREFIX) || message.author.bot) return;
 
-  const command = message.content
-    .substring(COMMAND_PREFIX.length)
-    .toLowerCase();
+//   const command = message.content
+//     .substring(COMMAND_PREFIX.length)
+//     .toLowerCase();
+//   if (commandHandlers[command]) {
+//     commandHandlers[command](message);
+//   } else {
+//     message.channel.send("Je ne connais pas cette commande bg/blg");
+//   }
+// });
 
-  // Commande text
-  if (command.startsWith("text")) {
-    const rollingMessage = await message.channel.send(
-      "🖼️ Génération de l'image en cours..."
-    );
-
-    setTimeout(async () => {
-      const texte = message.content.slice(6).trim(); // Extraire le texte après &text
-      const imagePath = path.join(__dirname, "asset", "test.jpg");
-
-      console.log("texte", texte);
-      console.log("imagePath", imagePath);
-
-      try {
-        const image = await loadImage(imagePath);
-        const canvas = createCanvas(image.width, image.height);
-        const ctx = canvas.getContext("2d");
-
-        // Dessiner l'image sur le canvas
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-        // Ajouter le texte à l'image
-        ctx.font = "30px sans-serif";
-        ctx.fillStyle = "white";
-        ctx.fillText(texte, 50, 50);
-
-        // Créer l'attachement avec l'image générée
-        const attachment = new AttachmentBuilder(canvas.toBuffer(), {
-          name: "image-texte.png",
-        });
-
-        // Modifier le message pour envoyer l'image avec le texte
-        rollingMessage.edit({
-          content: "Voici votre image avec le texte !",
-          files: [attachment],
-        });
-      } catch (error) {
-        console.error("Erreur lors du traitement de l'image :", error);
-        rollingMessage.edit(
-          "Une erreur est survenue lors de la génération de l'image."
-        );
-      }
-    }, 1000);
-  } else if (commandHandlers[command]) {
-    commandHandlers[command](message);
-  } else {
-    message.channel.send("Je ne connais pas cette commande bg/blg");
+commandHandlers.thybot = (message, args) => {
+  if (args.length === 0) {
+    return message.channel.send("Pose-moi une vraie question, bg !");
   }
-});
+
+  const question = args.join(" ");
+  const answers = [
+    "Oui",
+    "Non",
+    "Peut-être",
+    "Probablement",
+    "Je ne sais pas",
+    "Demande à Nana",
+    "waya",
+    "Demande à Chat GPT",
+    "Tg",
+    "Je sais pas pourquoi tu me demandes ça ? ",
+    "Evidemment",
+    "C'est sur !",
+  ];
+  const randomIndex = Math.floor(Math.random() * answers.length);
+  message.channel.send(`${message.author} **→** ${answers[randomIndex]}`);
+};
 
 client.on("messageCreate", (message) => {
   if (!message.content.startsWith(COMMAND_PREFIX) || message.author.bot) return;
 
-  const command = message.content
-    .substring(COMMAND_PREFIX.length)
-    .toLowerCase();
+  const args = message.content.slice(COMMAND_PREFIX.length).trim().split(/\s+/);
+  const command = args.shift().toLowerCase();
+
   if (commandHandlers[command]) {
-    commandHandlers[command](message);
+    commandHandlers[command](message, args);
   } else {
     message.channel.send("Je ne connais pas cette commande bg/blg");
   }
 });
+
+const axios = require("axios");
+
+commandHandlers.facts = async (message) => {
+  try {
+    const response = await axios.get(
+      "https://uselessfacts.jsph.pl/random.json?language=fr"
+    );
+    const fact = response.data.text;
+
+    message.channel.send(`🧠 **Le saviez-vous ?**\n>>> ${fact}`);
+  } catch (error) {
+    console.error("Erreur lors de la récupération du fait aléatoire :", error);
+    message.channel.send(
+      "Désolé, je n'ai pas pu récupérer un fait aléatoire pour le moment."
+    );
+  }
+};
 
 client.login(TOKEN);
