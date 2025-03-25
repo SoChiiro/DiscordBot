@@ -101,6 +101,12 @@ const commandHandlers = {
     message.channel.send(reply);
   },
 
+  meme: async (message) => {
+    const meme = await fetch("https://meme-api.herokuapp.com/gimme");
+    const memeJson = await meme.json();
+    message.channel.send(memeJson.url);
+  },
+
   // love: (message) => {
   //   try {
   //     console.log("Commande love exécutée");
