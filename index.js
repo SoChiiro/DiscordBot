@@ -42,7 +42,7 @@ const commands = {
   thybot: "Pose une question à ThyBot",
   facts: "Affiche un fait aléatoire",
   help: "Affiche cette liste de commandes.",
-  // love: "Ship deux personnes pour voir leur compatibilité",
+  love: "Ship deux personnes pour voir leur compatibilité moooooooo",
   // Bebou: "Love",
   // jey: "**Insulte Jey**",
   // dodo: "Vous trouverez une excuse pour ne pas venir, mais à la dodo",
@@ -303,6 +303,51 @@ const commandHandlers = {
 //   }
 // });
 
+commandHandlers.love = async (message, args) => {
+  if (args.length !== 2) {
+    return message.channel.send(
+      "💔 **Il faut mentionner deux personnes pour les shipper !**"
+    );
+  }
+
+  const [firstUser, secondUser] = args;
+  const randomPercentage = Math.floor(Math.random() * 101);
+
+  console.log(
+    `💘 Compatibilité entre ${firstUser} et ${secondUser} : ${randomPercentage}%`
+  );
+  const progressBar = (percentage) => {
+    const full = "🟥";
+    const empty = "⬛";
+    const progress = Math.round((percentage / 100) * 10);
+    return full.repeat(progress) + empty.repeat(10 - progress);
+  };
+
+  const suspenseMessage = await message.channel.send(
+    `💞 **Analyse de la compatibilité entre ${firstUser} et ${secondUser}...**`
+  );
+
+  setTimeout(() => {
+    let response = `💖 **Résultat final :**\n💑 **${firstUser}** ❤️ **${secondUser}**\n\n`;
+    response += `💘 Compatibilité : **${randomPercentage}%**\n`;
+    response += `📊 ${progressBar(randomPercentage)}\n\n`;
+
+    if (randomPercentage === 100) {
+      response += `💍 **Inshallah c'est le mariage** 💕🥰`;
+    } else if (randomPercentage >= 80) {
+      response += `🔥 **Shessssssssssssssssssssh** 💓`;
+    } else if (randomPercentage >= 50) {
+      response += `😏 **Oh.... Pas mal ** 💫`;
+    } else if (randomPercentage >= 30) {
+      response += `🤔 **Bon bah psartek hein**`;
+    } else {
+      response += `💔 **Ah ok** 😭`;
+    }
+
+    suspenseMessage.edit(response);
+  }, 2000);
+};
+
 commandHandlers.thybot = (message, args) => {
   if (args.length === 0) {
     return message.channel.send("Pose-moi une vraie question, bg !");
@@ -313,15 +358,13 @@ commandHandlers.thybot = (message, args) => {
     "Oui",
     "Non",
     "Peut-être",
-    "Probablement",
-    "Je ne sais pas",
     "Demande à Nana",
     "waya",
     "Demande à Chat GPT",
     "Tg",
-    "Je sais pas pourquoi tu me demandes ça ? ",
     "Evidemment",
     "C'est sur !",
+    "Certainement, je t'en dis pas plus",
   ];
   const randomIndex = Math.floor(Math.random() * answers.length);
   message.channel.send(`${message.author} **→** ${answers[randomIndex]}`);
