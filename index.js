@@ -43,35 +43,9 @@ const commands = {
   facts: "Affiche un fait aléatoire",
   help: "Affiche cette liste de commandes.",
   love: "Ship deux personnes pour voir leur compatibilité moooooooo",
-  // Bebou: "Love",
-  // jey: "**Insulte Jey**",
   // dodo: "Vous trouverez une excuse pour ne pas venir, mais à la dodo",
   // PCP: "//////////////////////////////",
 };
-
-const insults = [
-  "idiot",
-  "crétin",
-  "abruti",
-  "andouille",
-  "demeuré",
-  "débile",
-  "débile mental",
-  "imbécile",
-  "bébé cadum",
-  "nul",
-  "sale merde",
-  "salaud",
-  "sang de bique",
-  "sang de saucisse",
-  "Tu auras pas Thomas",
-  "tête de bite",
-  "tête de con",
-  "tête de merde",
-  "tête de nique",
-  "tête de bois",
-  "tête de mule",
-];
 
 const courage = [
   "Le succès, c'est la capacité de passer d'échec en échec sans perdre son enthousiasme. - Nana Churchill",
@@ -182,9 +156,7 @@ const commandHandlers = {
     }, 1000);
   },
 
-  // Masterclass des commandes
   howpd: (message) => {
-    // Génère un nombre aléatoire compris entre 1 et 100
     const randomNumber = Math.floor(Math.random() * 101);
     console.log(randomNumber);
     if (randomNumber === 0) {
@@ -290,19 +262,6 @@ const commandHandlers = {
   },
 };
 
-// client.on("messageCreate", (message) => {
-//   if (!message.content.startsWith(COMMAND_PREFIX) || message.author.bot) return;
-
-//   const command = message.content
-//     .substring(COMMAND_PREFIX.length)
-//     .toLowerCase();
-//   if (commandHandlers[command]) {
-//     commandHandlers[command](message);
-//   } else {
-//     message.channel.send("Je ne connais pas cette commande bg/blg");
-//   }
-// });
-
 commandHandlers.love = async (message, args) => {
   if (args.length !== 2) {
     return message.channel.send(
@@ -353,7 +312,6 @@ commandHandlers.thybot = (message, args) => {
     return message.channel.send("Pose-moi une vraie question, bg !");
   }
 
-  const question = args.join(" ");
   const answers = [
     "Oui",
     "Non",
