@@ -5,16 +5,14 @@
 Hello i'm ThyBot !
 With me you can : 
 
-  - news: Affiche les prochaines nouveautés du bot
-  - maj: Affiche les dernières mises à jour du bot
-  - ping: Vérifie si le bot est en ligne.
-  - Bebou: Love
-  - hey: hello there
-  - waya: waya
-  - howpd: Vérifie ton niveau d'hétéro
-  - PCP: //////////////////////////////
-  - jey: Insulte Jey
-  - kitsu: You know
-  - nana: Vous trouverez de la sincérité dans ses propos
-  - dodo: Vous trouverez une excuse pour ne pas venir, mais à la dodo
-  - help: Affiche cette liste de commandes.
+news: "Affiche les prochaines nouveautés du bot",
+ping: "Vérifie si le bot est en ligne.",
+waya: "waya",
+nana: "Vous trouverez de la sincérité dans ses propos",
+roll6: "Lance un dé à 6 faces",
+roll20: "Lance un dé à 20 faces",
+meme: "Affiche un mème aléatoire",
+thybot: "Pose une question à ThyBot",
+facts: "Affiche un fait aléatoire",
+help: "Affiche cette liste de commandes.",
+love: "Ship deux personnes pour voir leur compatibilité moooooooo",
